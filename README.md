@@ -147,7 +147,7 @@ This template creates only the Azure OpenAI resource, which is free to provision
 
 ### Security guidelines
 
-This template uses [keyless authentication](https://learn.microsoft.com/en-us/azure/developer/ai/keyless-connections) for authenticating to the Azure OpenAI resource. This is a secure way to authenticate to Azure resources without needing to store credentials in your code. Your Azure user account is assigned the "Cognitive Services OpenAI User" role, which allows you to access the OpenAI resource. You can find more information about the permissions of this role in the [Azure OpenAI documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/role-based-access-control).
+This template uses [keyless authentication](https://learn.microsoft.com/azure/developer/ai/keyless-connections) for authenticating to the Azure OpenAI resource. This is a secure way to authenticate to Azure resources without needing to store credentials in your code. Your Azure user account is assigned the "Cognitive Services OpenAI User" role, which allows you to access the OpenAI resource. You can find more information about the permissions of this role in the [Azure OpenAI documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/role-based-access-control).
 
 For further security, you could also deploy the Azure OpenAI inside a private virtual network (VNet) and use a private endpoint to access it. This would prevent the OpenAI resource from being accessed from the public internet.
 

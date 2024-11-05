@@ -1,8 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/Azure/azure-dev/main/schemas/v1.0/azure.yaml.json
 
-name: azure-openai-keyless-python
+name: azure-openai-entity-extraction
 metadata:
-  template: azure-openai-keyless-python@0.0.4
+  template: azure-openai-entity-extraction@0.0.4
 hooks:
   postprovision:
     windows:
