@@ -25,6 +25,7 @@ client = openai.AzureOpenAI(
 )
 model_name = os.getenv("AZURE_OPENAI_GPT_DEPLOYMENT")
 
+
 # Define models for Structured Outputs
 class Technology(str, Enum):
     JAVASCRIPT = "JavaScript"
@@ -36,6 +37,7 @@ class Technology(str, Enum):
     COSMOSDB = "CosmosDB"
     AZURESQL = "Azure SQL"
 
+
 class HackSubmission(BaseModel):
     name: str
     description: str = Field(..., description="A 1-2 sentence description of the project")
@@ -44,13 +46,14 @@ class HackSubmission(BaseModel):
     video_url: str
     team_members: list[str]
 
+
 # Fetch an issue from a public GitHub repository
-url = 'https://api.github.com/repos/microsoft/RAG_Hack/issues/159'
+url = "https://api.github.com/repos/microsoft/RAG_Hack/issues/159"
 response = requests.get(url)
 if response.status_code != 200:
-    logging.error(f'Failed to fetch issue: {response.status_code}')
+    logging.error(f"Failed to fetch issue: {response.status_code}")
     exit(1)
-issue_body = response.json()['body']
+issue_body = response.json()["body"]
 
 # Send request to GPT model to extract using Structured Outputs
 completion = client.beta.chat.completions.parse(
@@ -65,4 +68,3 @@ completion = client.beta.chat.completions.parse(
 output = completion.choices[0].message.parsed
 hack_submission = HackSubmission.model_validate(output)
 print(hack_submission)
-

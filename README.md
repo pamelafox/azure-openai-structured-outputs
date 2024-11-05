@@ -1,7 +1,7 @@
 <!--
 ---
 name: Entity extraction with Azure OpenAI structured outputs
-description: Use Azure OpenAI structured outputs and the openai Python SDK to extract details from images, GitHub issues, PDFs, and more. 
+description: Use Azure OpenAI structured outputs and the openai Python SDK to extract details from images, GitHub issues, PDFs, and more.
 languages:
 - python
 - bicep

@@ -23,6 +23,7 @@ client = openai.AzureOpenAI(
     azure_ad_token_provider=token_provider,
 )
 
+
 # Define models for Structured Outputs
 class Plant(BaseModel):
     species: str
@@ -33,10 +34,12 @@ class Plant(BaseModel):
     county: str
     notes: str
 
+
 class PlantInventory(BaseModel):
     annuals: list[Plant]
     bulbs: list[Plant]
     grasses: list[Plant]
+
 
 # Prepare local image as base64 URI
 def open_image_as_base64(filename):
@@ -44,6 +47,8 @@ def open_image_as_base64(filename):
         image_data = image_file.read()
     image_base64 = base64.b64encode(image_data).decode("utf-8")
     return f"data:image/png;base64,{image_base64}"
+
+
 image_url = open_image_as_base64("example_table_plants.png")
 
 # Send request to GPT model to extract using Structured Outputs
@@ -56,7 +61,7 @@ completion = client.beta.chat.completions.parse(
             "content": [
                 {"image_url": {"url": image_url}, "type": "image_url"},
             ],
-        }
+        },
     ],
     response_format=PlantInventory,
 )
@@ -64,4 +69,3 @@ completion = client.beta.chat.completions.parse(
 output = completion.choices[0].message.parsed
 plant_inventory = PlantInventory.model_validate(output)
 print(plant_inventory)
-

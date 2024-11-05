@@ -25,11 +25,13 @@ client = openai.AzureOpenAI(
     azure_ad_token_provider=token_provider,
 )
 
+
 # Define models for Structured Outputs
 class Language(str, Enum):
     JAVASCRIPT = "JavaScript"
     PYTHON = "Python"
     DOTNET = ".NET"
+
 
 class AzureService(str, Enum):
     AISTUDIO = "AI Studio"
@@ -37,6 +39,7 @@ class AzureService(str, Enum):
     POSTGRESQL = "PostgreSQL"
     COSMOSDB = "CosmosDB"
     AZURESQL = "Azure SQL"
+
 
 class Framework(str, Enum):
     LANGCHAIN = "Langchain"
@@ -46,6 +49,7 @@ class Framework(str, Enum):
     SPRINGBOOT = "Spring Boot"
     PROMPTY = "Prompty"
 
+
 class RepoOverview(BaseModel):
     name: str
     description: str = Field(..., description="A 1-2 sentence description of the project")
@@ -53,20 +57,24 @@ class RepoOverview(BaseModel):
     azure_services: list[AzureService]
     frameworks: list[Framework]
 
+
 # Fetch a README from a public GitHub repository
-url = 'https://api.github.com/repos/shank250/CareerCanvas-msft-raghack/contents/README.md'
+url = "https://api.github.com/repos/shank250/CareerCanvas-msft-raghack/contents/README.md"
 response = requests.get(url)
 if response.status_code != 200:
-    logging.error(f'Failed to fetch issue: {response.status_code}')
+    logging.error(f"Failed to fetch issue: {response.status_code}")
     exit(1)
 content = response.json()
-readme_content = base64.b64decode(content['content']).decode('utf-8')
+readme_content = base64.b64decode(content["content"]).decode("utf-8")
 
 # Send request to GPT model to extract using Structured Outputs
 completion = client.beta.chat.completions.parse(
     model=os.getenv("AZURE_OPENAI_GPT_DEPLOYMENT"),
     messages=[
-        {"role": "system", "content": "Extract the information from the GitHub issue markdown about this hack submission."},
+        {
+            "role": "system",
+            "content": "Extract the information from the GitHub issue markdown about this hack submission.",
+        },
         {"role": "user", "content": readme_content},
     ],
     response_format=RepoOverview,
@@ -75,4 +83,3 @@ completion = client.beta.chat.completions.parse(
 output = completion.choices[0].message.parsed
 repo_overview = RepoOverview.model_validate(output)
 rich.print(repo_overview)
-

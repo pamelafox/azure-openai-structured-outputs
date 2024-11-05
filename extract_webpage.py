@@ -25,21 +25,23 @@ client = openai.AzureOpenAI(
 )
 model_name = os.getenv("AZURE_OPENAI_GPT_DEPLOYMENT")
 
+
 # Define models for Structured Outputs
 class BlogPost(BaseModel):
     title: str
     summary: str = Field(..., description="A 1-2 sentence summary of the blog post")
     tags: list[str] = Field(..., description="A list of tags for the blog post, like 'python' or 'openai'")
 
+
 # Fetch blog post and extract title/content
-url = 'https://blog.pamelafox.org/2024/09/integrating-vision-into-rag-applications.html'
+url = "https://blog.pamelafox.org/2024/09/integrating-vision-into-rag-applications.html"
 response = requests.get(url)
-if response.status_code !=  200:
-    print(f'Failed to fetch the page: {response.status_code}')
+if response.status_code != 200:
+    print(f"Failed to fetch the page: {response.status_code}")
     exit(1)
-soup = BeautifulSoup(response.content, 'html.parser')
-post_title = soup.find('h3', class_='post-title')
-post_contents = soup.find('div', class_='post-body').get_text(strip=True)
+soup = BeautifulSoup(response.content, "html.parser")
+post_title = soup.find("h3", class_="post-title")
+post_contents = soup.find("div", class_="post-body").get_text(strip=True)
 
 
 # Send request to GPT model to extract using Structured Outputs
@@ -55,4 +57,3 @@ completion = client.beta.chat.completions.parse(
 output = completion.choices[0].message.parsed
 blog_post = BlogPost.model_validate(output)
 print(blog_post)
-

@@ -24,18 +24,21 @@ client = openai.AzureOpenAI(
 )
 model_name = os.getenv("AZURE_OPENAI_GPT_DEPLOYMENT")
 
+
 # Define models for Structured Outputs
 class Item(BaseModel):
     product: str
     price: float
     quantity: int
 
+
 class Receipt(BaseModel):
-   total: float
-   shipping: float
-   payment_method: str
-   items: list[Item]
-   order_number: int
+    total: float
+    shipping: float
+    payment_method: str
+    items: list[Item]
+    order_number: int
+
 
 # Prepare PDF as markdown text
 md_text = pymupdf4llm.to_markdown("example_receipt.pdf")
@@ -53,4 +56,3 @@ completion = client.beta.chat.completions.parse(
 output = completion.choices[0].message.parsed
 receipt = Receipt.model_validate(output)
 print(receipt)
-

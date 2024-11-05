@@ -1,6 +1,6 @@
 # This is for internal use to make sure our samples follow best practices. You can delete this in your fork.
 name: Template validation sample workflow
-on: 
+on:
   workflow_dispatch:
 
 permissions:
