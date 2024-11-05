@@ -7,9 +7,20 @@
     "customizations": {
         "vscode": {
             "extensions": [
+                "ms-python.python",
+				"ms-python.vscode-pylance",
+				"charliermarsh.ruff",
                 "ms-azuretools.azure-dev",
                 "ms-azuretools.vscode-bicep"
-            ]
+            ],
+            "python.defaultInterpreterPath": "/usr/local/bin/python",
+            "[python]": {
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll": "explicit"
+                },
+                "editor.defaultFormatter": "charliermarsh.ruff"
+			}
         }
     },
     "postCreateCommand": "",
