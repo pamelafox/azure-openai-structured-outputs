@@ -7,11 +7,11 @@ hooks:
   postprovision:
     windows:
       shell: pwsh
-      run: ./write_dot_env.ps1
+      run: ./infra/write_dot_env.ps1
       interactive: false
       continueOnError: false
     posix:
       shell: sh
-      run: ./write_dot_env.sh
+      run: ./infra/write_dot_env.sh
       interactive: false
       continueOnError: false

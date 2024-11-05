@@ -1,33 +1,29 @@
+import base64
 import logging
 import os
 
 import azure.identity
 import openai
-from pydantic import BaseModel
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from rich import print
 
-import base64
-import rich
-
-load_dotenv()
-# Change to logging.DEBUG for more verbose logging from Azure and OpenAI SDKs
 logging.basicConfig(level=logging.WARNING)
+load_dotenv()
 
-
+# Configure Azure OpenAI
 if not os.getenv("AZURE_OPENAI_SERVICE") or not os.getenv("AZURE_OPENAI_GPT_DEPLOYMENT"):
     logging.warning("AZURE_OPENAI_SERVICE and AZURE_OPENAI_GPT_DEPLOYMENT environment variables are empty. See README.")
     exit(1)
-
-
 credential = azure.identity.DefaultAzureCredential()
 token_provider = azure.identity.get_bearer_token_provider(credential, "https://cognitiveservices.azure.com/.default")
-
 client = openai.AzureOpenAI(
     api_version="2024-08-01-preview",
     azure_endpoint=f"https://{os.getenv('AZURE_OPENAI_SERVICE')}.openai.azure.com",
     azure_ad_token_provider=token_provider,
 )
 
+# Define models for Structured Outputs
 class Plant(BaseModel):
     species: str
     common_name: str
@@ -42,12 +38,15 @@ class PlantInventory(BaseModel):
     bulbs: list[Plant]
     grasses: list[Plant]
 
+# Prepare local image as base64 URI
 def open_image_as_base64(filename):
     with open(filename, "rb") as image_file:
         image_data = image_file.read()
     image_base64 = base64.b64encode(image_data).decode("utf-8")
     return f"data:image/png;base64,{image_base64}"
+image_url = open_image_as_base64("example_table_plants.png")
 
+# Send request to GPT model to extract using Structured Outputs
 completion = client.beta.chat.completions.parse(
     model=os.getenv("AZURE_OPENAI_GPT_DEPLOYMENT"),
     messages=[
@@ -55,7 +54,7 @@ completion = client.beta.chat.completions.parse(
         {
             "role": "user",
             "content": [
-                {"image_url": {"url": open_image_as_base64("nursery_page0.png")}, "type": "image_url"},
+                {"image_url": {"url": image_url}, "type": "image_url"},
             ],
         }
     ],
@@ -63,7 +62,6 @@ completion = client.beta.chat.completions.parse(
 )
 
 output = completion.choices[0].message.parsed
-
-output = PlantInventory.model_validate(output)
-rich.print(output)
+plant_inventory = PlantInventory.model_validate(output)
+print(plant_inventory)
 

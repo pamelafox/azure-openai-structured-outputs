@@ -1,7 +1,7 @@
 <!--
 ---
-name: Azure OpenAI resource with keyless auth (Python)
-description: Provision an Azure OpenAI resource with keyless authentication and use the Python OpenAI SDK to connect to it.
+name: Entity extraction with Azure OpenAI structured outputs
+description: Use Azure OpenAI structured outputs and the openai Python SDK to extract details from images, GitHub issues, PDFs, and more. 
 languages:
 - python
 - bicep
@@ -10,16 +10,15 @@ products:
 - azure-openai
 - azure
 page_type: sample
-urlFragment: azure-openai-keyless-python
+urlFragment: azure-openai-entity-extraction
 ---
 -->
-# Azure OpenAI resource with keyless auth (Python)
+# Entity extraction with Azure OpenAI structured outputs (Python)
 
 [![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&skip_quickstart=true&machine=basicLinux32gb&repo=784926917&devcontainer_path=.devcontainer%2Fdevcontainer.json&geo=WestUs2)
-[![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Azure-Samples/azure-openai-keyless-python)
+[![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/Azure-Samples/azure-openai-entity-extraction)
 
-The purpose of this repository is to provision an Azure OpenAI account with an RBAC role permission for your user account to access,
-so that you can use the OpenAI API SDKs with keyless (Entra) authentication.
+This repository includes both the infrastructure and Python files needed so that you can create an Azure OpenAI gpt-4o model deployment and then perform entity extraction using the [structured outputs mode](https://learn.microsoft.com/azure/ai-services/openai/how-to/structured-outputs?tabs=python-secure) and the Python openai SDK. Example scripts are provided for extracting details from images, PDFs, webpages, and GitHub issues.
 
 * [Features](#features)
 * [Getting started](#getting-started)
@@ -37,8 +36,8 @@ so that you can use the OpenAI API SDKs with keyless (Entra) authentication.
 
 * Provisions an Azure OpenAI account with keyless authentication enabled
 * Grants the "Cognitive Services OpenAI User" RBAC role to your user account
-* Deploys a gpt-4o-mini model by default, but you can modify the [Bicep template](infra/main.bicep) to deploy other models
-* Example script uses the [openai](https://pypi.org/project/openai/) Python package to make a request to the Azure OpenAI API
+* Deploys a gpt-4o model, version 2024-08-06 (the [only version supported for structured outputs](https://learn.microsoft.com/azure/ai-services/openai/how-to/structured-outputs?tabs=python-secure#supported-models)
+* Example scripts use the [openai Python package](https://pypi.org/project/openai/) and [Pydantic models](https://docs.pydantic.dev/) to make requests for structured outputs
 
 ### Architecture diagram
 
@@ -55,7 +54,7 @@ You can run this template virtually by using GitHub Codespaces. The button will 
 
 1. Open the template (this may take several minutes):
 
-    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/azure-openai-keyless-python)
+    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Azure-Samples/azure-openai-entity-extraction)
 
 2. Open a terminal window
 3. Continue with the [deployment steps](#deployment)
@@ -67,7 +66,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
 1. Start Docker Desktop (install it if not already installed)
 2. Open the project:
 
-    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/azure-openai-keyless-python)
+    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/azure-openai-entity-extraction)
 
 3. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window.
 4. Continue with the [deployment steps](#deployment)
@@ -79,10 +78,10 @@ A related option is VS Code Dev Containers, which will open the project in your 
     * [Azure Developer CLI (azd)](https://aka.ms/install-azd)
     * [Python 3.9+](https://www.python.org/downloads/)
 
-2. Make a new directory called `azure-openai-keyless-python` and clone this template into it using the `azd` CLI:
+2. Make a new directory called `azure-openai-entity-extraction` and clone this template into it using the `azd` CLI:
 
     ```shell
-    azd init -t azure-openai-keyless-python
+    azd init -t azure-openai-entity-extraction
     ```
 
     You can also use git to clone the repository if you prefer.
@@ -109,7 +108,7 @@ A related option is VS Code Dev Containers, which will open the project in your 
     azd provision
     ```
 
-    It will prompt you to provide an `azd` environment name (like "chat-app"), select a subscription from your Azure account, and select a [location where the OpenAI model is available](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) (like "canadaeast"). Then it will provision the resources in your account and deploy the latest code.
+    It will prompt you to provide an `azd` environment name (like "entityext"), select a subscription from your Azure account, and select a [location where the OpenAI model is available](https://learn.microsoft.com/azure/ai-services/openai/concepts/models#standard-deployment-model-availability) (like "canadaeast"). Then it will provision the resources in your account and deploy the latest code.
 
     ⚠️ If you get an error or timeout with deployment, changing the location can help, as there may be availability constraints for the OpenAI resource. To change the location run:
 
@@ -117,21 +116,9 @@ A related option is VS Code Dev Containers, which will open the project in your 
     azd env set AZURE_LOCATION "yournewlocationname"
     ```
 
-3. When `azd` has finished, you should have an OpenAI account you can use locally when logged into your Azure account. You can output the necessary environment variables into an `.env` file by running a script:
+3. When `azd` has finished, you should have an OpenAI account you can use locally when logged into your Azure account, and a `.env` file should now exist with your Azure OpenAI configuration.
 
-    For Mac OS X / Linux:
-
-    ```shell
-    ./write_dot_env.sh
-    ```
-
-    For Windows:
-
-    ```shell
-    pwsh ./write_dot_env.ps1
-    ```
-
-4. Then you can proceed to [run the Python example](#running-the-python-example).
+4. Then you can proceed to [run the Python examples](#running-the-python-examples).
 
 ## Running the Python example
 
@@ -143,13 +130,14 @@ A related option is VS Code Dev Containers, which will open the project in your 
     python -m pip install -r requirements.txt
     ```
 
-3. Run the example:
+3. Run an example by running either `python example_file.py` or selecting the `Run` button on the opened file. Available examples:
 
-    ```shell
-    python example.py
-    ```
-
-    This will use the OpenAI API SDK to make a request to the OpenAI API and print the response.
+    * `extract_github_issue.py`: Fetches a public issue using the GitHub API, and then extracts details.
+    * `extract_github_repo.py`: Fetches a public README using the GitHub API, and then extracts details.
+    * `extract_image_graph.py`: Parses a local image of a graph and extracts details like title, axis, legend.
+    * `extract_image_table.py`: Parses a local image with tables and extracts nested tabular data.
+    * `extract_pdf_receipt.py`: Parses a local PDF using `pymupdf`, which converts it to Markdown, and extracts order details.
+    * `extract_webpage.py`: Parses a blog post using `BeautifulSoup`, and extracts title, description, and tags.
 
 ## Guidance
 
@@ -165,5 +153,4 @@ For further security, you could also deploy the Azure OpenAI inside a private vi
 
 ## Resources
 
-* [Video: Using keyless auth with Azure AI services](https://www.youtube.com/watch?v=IkDcQvKoQ8k)
-* [Sample app: Azure OpenAI + Container Apps + Managed Identity](https://github.com/Azure-Samples/openai-chat-app-quickstart)
+* [How to use structured outputs](https://learn.microsoft.com/azure/ai-services/openai/how-to/structured-outputs?tabs=python-secure#supported-models)
