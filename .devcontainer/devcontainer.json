@@ -9,7 +9,8 @@
             "extensions": [
                 "ms-azuretools.azure-dev",
                 "ms-azuretools.vscode-bicep"
-            ]
+            ],
+            "python.defaultInterpreterPath": "/usr/local/bin/python"
         }
     },
     "postCreateCommand": "",
