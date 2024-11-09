@@ -41,7 +41,7 @@ This repository includes both the infrastructure and Python files needed so that
 
 ### Architecture diagram
 
-![Architecture diagram: Microsoft Entra managed identity connecting to Azure AI services](./diagram.png)
+![Architecture diagram: Microsoft Entra managed identity connecting to Azure AI services](./readme_diagram.png)
 
 ## Getting started
 
