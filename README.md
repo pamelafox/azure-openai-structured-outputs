@@ -1,18 +1,5 @@
-<!--
----
-name: Entity extraction with Azure OpenAI structured outputs
-description: Use Azure OpenAI structured outputs and the openai Python SDK to extract details from images, GitHub issues, PDFs, and more.
-languages:
-- python
-- bicep
-- azdeveloper
-products:
-- azure-openai
-- azure
-page_type: sample
-urlFragment: azure-openai-entity-extraction
----
--->
+⚠️ This repo is now moved to https://github.com/Azure-Samples/azure-openai-entity-extraction
+
 # Entity extraction with Azure OpenAI structured outputs (Python)
 
 [![Open in GitHub Codespaces](https://img.shields.io/static/v1?style=for-the-badge&label=GitHub+Codespaces&message=Open&color=brightgreen&logo=github)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&skip_quickstart=true&machine=basicLinux32gb&repo=784926917&devcontainer_path=.devcontainer%2Fdevcontainer.json&geo=WestUs2)
